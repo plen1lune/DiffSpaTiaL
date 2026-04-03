@@ -22,11 +22,6 @@
 - **STL temporal operators**: low-level `Always`, `Eventually`, `Until`, `Next`
 - **End-to-end differentiable**: Gradients flow from logical robustness to physical states
 
-### Two Core Applications
-
-1. **Trajectory Optimization**: Maximize robustness of a spatio-temporal specification
-2. **Specification Learning**: Learn spatial parameters from demonstrations via backpropagation
-
 ## Installation
 
 Run all commands below from the repository root:
