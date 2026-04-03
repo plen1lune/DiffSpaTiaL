@@ -1,7 +1,7 @@
 # Differentiable SpaTiaL
 
 **A Differentiable Toolbox for Geometric Temporal Logic over 3D Robotic Manipulation**
-
+> This repo contains a minimal demo implementation. Full version coming in the next few weeks — stay tuned.
 ---
 
 ## Overview
