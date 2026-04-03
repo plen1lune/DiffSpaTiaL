@@ -18,8 +18,8 @@
 
 - **Smooth SAT**: Differentiable penetration depth via the Separating Axis Theorem
 - **Boundary-sampled SDF**: Differentiable signed distance for separated states
-- **15+ spatial predicates**: closeTo, farFrom, touch, overlap, enclIn, leftOf, above, ...
-- **STL temporal operators**: Always, Eventually, Until, Next
+- **Core spatial predicates**: closeTo, farFrom, touch, overlap, enclIn, leftOf, above, ...
+- **STL temporal operators**: low-level `Always`, `Eventually`, `Until`, `Next`
 - **End-to-end differentiable**: Gradients flow from logical robustness to physical states
 
 ### Two Core Applications
@@ -27,11 +27,35 @@
 1. **Trajectory Optimization**: Maximize robustness of a spatio-temporal specification
 2. **Specification Learning**: Learn spatial parameters from demonstrations via backpropagation
 
-## Quick Start
+## Installation
+
+Run all commands below from the repository root:
 
 ```bash
-pip install torch numpy matplotlib Pillow
+pip install -r requirements.txt
 ```
+
+Optional, for the notebook demo:
+
+```bash
+pip install jupyter
+```
+
+## Quick Start
+
+The fastest end-to-end smoke test is the trajectory optimization example:
+
+```bash
+python examples/trajectory_optimization.py
+```
+
+This script optimizes a collision-avoiding trajectory and writes:
+
+- `figures/traj_optimization.gif`
+
+## Low-Level API
+
+Runnable example using the low-level spatial and temporal operators:
 
 ```python
 import torch
@@ -39,22 +63,47 @@ from diffspatiall.spatial import make_box, make_cone, compute_face_normals, batc
 from diffspatiall.temporal import Always, Eventually
 
 # Create geometry
+robot_v, robot_f = make_box(torch.tensor([-0.2, -0.2, -0.2]),
+                            torch.tensor([0.2, 0.2, 0.2]))
 cone_v, cone_f = make_cone(torch.tensor([0., 0., 3.]), radius=2.5, height=5.0)
 cone_n = compute_face_normals(cone_v, cone_f)
+goal_v, goal_f = make_box(torch.tensor([-0.5, -0.5, 7.5]),
+                          torch.tensor([0.5, 0.5, 8.5]))
+goal_n = compute_face_normals(goal_v, goal_f)
 
-# Compute differentiable signed distance along a trajectory
-sd = batched_polyhedron_sd(robot_trajectory, cone_v, cone_f, cone_n)
+# Straight-line robot trajectory: (T, V, 3)
+T = 20
+start = torch.tensor([0., 0., 0.])
+end = torch.tensor([0., 0., 8.0])
+alpha = torch.linspace(0, 1, T).unsqueeze(1)
+centers = start * (1 - alpha) + end * alpha
+robot_trajectory = centers.unsqueeze(1) + robot_v.unsqueeze(0)
+
+eps_far = 0.5
+eps_close = 0.5
+
+# Compute differentiable signed distance traces along the trajectory
+sd_cone = batched_polyhedron_sd(
+    robot_trajectory, cone_v, cone_f, cone_n, tau=1e-2, robot_faces=robot_f
+)
+sd_goal = batched_polyhedron_sd(
+    robot_trajectory, goal_v, goal_f, goal_n, tau=1e-2, robot_faces=robot_f
+)
 
 # Apply temporal operators
-always_safe = Always()(sd.unsqueeze(0).unsqueeze(-1) - epsilon)    # G(farFrom)
-eventually_reach = Eventually()(epsilon - sd.unsqueeze(0).unsqueeze(-1))  # F(closeTo)
+always_safe = Always()(sd_cone.unsqueeze(0).unsqueeze(-1) - eps_far)  # G(farFrom)
+eventually_reach = Eventually()(
+    eps_close - torch.relu(sd_goal).unsqueeze(0).unsqueeze(-1)
+)  # F(closeTo)
 
 # Robustness is differentiable!
 robustness = torch.min(always_safe[0, 0, 0], eventually_reach[0, 0, 0])
-robustness.backward()  # gradients flow to robot_trajectory
+print(float(robustness))
 ```
 
 ### High-Level Formula API
+
+Illustrative high-level formula construction:
 
 ```python
 from diffspatiall.formula import close_to, far_from, always, eventually, And, ConvexPolyhedron
@@ -66,6 +115,7 @@ spec = And(
 )
 
 # Evaluate on trajectory data
+# `signals` and `geometry` follow the setup used in `demo.ipynb`
 robustness = spec(signals, geometry=geometry)  # fully differentiable
 ```
 
@@ -83,6 +133,17 @@ The notebook walks through:
 4. Spatial predicates
 5. Temporal operators
 6. Full trajectory optimization
+
+## Release Scope
+
+This demo release intentionally prioritizes clarity over completeness. It includes:
+
+- Core smooth geometric primitives in `diffspatiall/spatial.py`
+- Low-level STL temporal operators in `diffspatiall/temporal.py`
+- A lightweight high-level formula API in `diffspatiall/formula.py`
+- A runnable optimization example in `examples/trajectory_optimization.py`
+
+The more optimized internal research code used for ongoing extensions is not included in this minimal release.
 
 ## Predicate Gallery
 
