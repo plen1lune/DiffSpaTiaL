@@ -159,7 +159,7 @@ The more optimized internal research code used for ongoing extensions is not inc
 ## Citation
 
 ```bibtex
-@inproceedings{luo2025diffspatiall,
+@inproceedings{luo2026nl2spatialgeneratinggeometricspatiotemporal,
   title={Differentiable SpaTiaL: Symbolic Learning and Reasoning with Geometric Temporal Logic for Manipulation Tasks},
   author={Luo, Licheng and Liang, Kaier and Vasile, Cristian-Ioan and Cai, Mingyu},
   booktitle={IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
