@@ -159,14 +159,14 @@ The more optimized internal research code used for ongoing extensions is not inc
 ## Citation
 
 ```bibtex
-@misc{luo2026nl2spatialgeneratinggeometricspatiotemporal,
-      title={NL2SpaTiaL: Generating Geometric Spatio-Temporal Logic Specifications from Natural Language for Manipulation Tasks}, 
-      author={Licheng Luo and Kaier Liang and Yu Xia and Mingyu Cai},
+@misc{luo2026differentiablespatialsymboliclearning,
+      title={Differentiable SpaTiaL: Symbolic Learning and Reasoning with Geometric Temporal Logic for Manipulation Tasks}, 
+      author={Licheng Luo and Kaier Liang and Cristian-Ioan Vasile and Mingyu Cai},
       year={2026},
-      eprint={2512.13670},
+      eprint={2604.02643},
       archivePrefix={arXiv},
       primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2512.13670}, 
+      url={https://arxiv.org/abs/2604.02643}, 
 }
 ```
 
